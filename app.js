@@ -34,3 +34,22 @@ app.use('/different/:id', function (req, res, next){
 	next();
 });
 
+//Handles requests that don't fall in anything else
+// give 400 not found
+app.use(function(req, res, next){
+	var err = new Err("Not Found");
+	err.satus = 400;
+	next(err);
+});
+
+//Error Handler , take a fourth paramenter, that how express now is a error handleer and not middlewae
+app.use(function(err, req, res, next){
+	//if error status is undefined 500 is used
+	res.status(err.status || 500);
+	res.json ({
+		error: {
+			message: err.message
+		}
+	});
+
+});
