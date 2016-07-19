@@ -45,6 +45,7 @@ app.use(function(req, res, next){
 //Error Handler , take a fourth paramenter, that how express now is a error handleer and not middlewae
 app.use(function(err, req, res, next){
 	//if error status is undefined 500 is used
+	// for instance if in one of the middleware you have a refennce error not defined var will get here
 	res.status(err.status || 500);
 	res.json ({
 		error: {
