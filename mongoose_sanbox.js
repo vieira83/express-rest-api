@@ -6,7 +6,11 @@ $ use sandbox
 $ db.getCollectionNames();
 $ db.animals
 $ db.animals.find()
+$ quit()
+to run these file in node
+$ node mongoose_sandbox.js
 */
+
 var mongoose = require('mongoose');
 
 //connect to the mongo server, takes 1 param
@@ -32,15 +36,15 @@ db.once("open", function() {
 	//Create a Schema Constructor , that will be used to create schemas
 	var Schema = mongoose.Schema;
 	var AnimalSchema = new Schema ({
-		type: String,
-		color: String,
-		size: String,
-		mass: Number,
-		name: String
+		type: {type: String, default: 'Goldfish'},
+		color: {type: String, default: 'red'},
+		size: {type: String, default: 'small'},
+		mass: {type: Number, default: '300'},
+		name: {type: String, default: 'default'}
 	});
 
-	// We will use the mongo schema to create a Model , used to create 
-	//   and sav documents
+	// We will use the mongo schema to create a MODEL , used to create 
+	//   and save documents
 	// FIrst param - name of Model
 	// Second Param - schema to be used, that defined animals
 	// Mongoose pluralizes the first param (name) and will map to 
@@ -56,14 +60,28 @@ db.once("open", function() {
 		name: "Lawrence"
 	});
 
-	elephant.save(function(){
-		//once finished close the connection
-		if (err) console.error("Error Save failed!", err);
-		else console.log(" Saved successful");
-		db.close(function() {
-			//notifies when connection is closed
-			console.log(" db connection Closed !");
-		});
+	var animal = new Animal({}); // created a Goldfish generic animal
+
+	//DELETING - empty the Animal model before saving, avoid multiple elephants
+	// SAVING -call back function save elephant or animal after emptying the model
+	Animal.remove({}, function(){
+		elephant.save(function(){
+			if (err)console.error("Error Save failed!", err);
+			animal.save(function(err){
+				if (err) console.error("Error Save failed!", err);
+				//once finished close the connection
+				db.close(function() {
+					//notifies when connection is closed
+					console.log(" db connection Closed !");
+				});
+			});
+		});	
 	});
 
+	// READING THE Database or Query the Dabase
+	Animal.find("size:small", function(err, animals){
+		animals.forEach(function(animal){
+			console.log(animal.name + " The " + animal.color + " " + animal.type );
+		});
+	})
 })
